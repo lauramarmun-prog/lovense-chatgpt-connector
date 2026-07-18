@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Lilazul Lovense</title>
+  <style>
+    :root{color-scheme:dark;--ink:#f8f5ff;--muted:#bdb4d3;--lila:#b690ff;--blue:#67d5ff;--rose:#ff7eba;--panel:rgba(22,17,42,.82)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;font:16px/1.5 system-ui,sans-serif;color:var(--ink);background:radial-gradient(circle at 20% 0,#35205f 0,transparent 40%),radial-gradient(circle at 90% 20%,#123c57 0,transparent 35%),#0d0a18;padding:24px}
+    main{width:min(760px,100%);margin:auto}.brand{font-size:clamp(2rem,8vw,4rem);margin:.2em 0;background:linear-gradient(90deg,var(--lila),var(--blue),var(--rose));color:transparent;background-clip:text}.lead{color:var(--muted);max-width:62ch}
+    section{background:var(--panel);border:1px solid #ffffff1f;border-radius:22px;padding:22px;margin:18px 0;box-shadow:0 20px 60px #0005}h2{margin-top:0;font-size:1.2rem}label{display:block;margin:12px 0 6px;color:var(--muted)}input,select,button{font:inherit;border-radius:12px;border:1px solid #ffffff2b;padding:12px;background:#120d24;color:var(--ink)}input,select{width:100%}button{cursor:pointer;background:linear-gradient(135deg,#704dc5,#287b9e);font-weight:700}button.secondary{background:#211a38}button.danger{background:linear-gradient(135deg,#a9295e,#e04f61)}button:disabled{opacity:.45;cursor:not-allowed}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}.hidden{display:none}.status{padding:10px 12px;border-radius:12px;background:#ffffff0c;color:var(--muted)}.device{display:flex;gap:10px;align-items:flex-start;padding:12px;border-bottom:1px solid #ffffff14}.device input{width:auto;margin-top:5px}.device strong{display:block}.device small{color:var(--muted)}#qr{display:block;width:min(280px,100%);margin:18px auto;border-radius:18px;background:white;padding:8px}.secret{display:flex;gap:8px}.secret input{font-family:ui-monospace,monospace}.notice{font-size:.9rem;color:var(--muted)}#message{position:sticky;bottom:12px;margin-top:15px;padding:12px;border-radius:12px;background:#231a3d;border:1px solid #ffffff24}.ok{color:#83efbd}.error{color:#ff9ab0}
+  </style>
+</head>
+<body>
+<main>
+  <h1 class="brand">Lilazul Lovense</h1>
+  <p class="lead">Tu espacio privado para conectar Lovense con tu IA. Úsalo la primera vez o cuando necesites reparar la conexión.</p>
+
+  <section id="login">
+    <h2>Entra en tu panel privado</h2>
+    <label for="ownerKey">Owner Key de Railway</label>
+    <input id="ownerKey" type="password" autocomplete="current-password" placeholder="Pega aquí tu clave privada">
+    <p class="notice">Esta clave se usa solo para abrir el panel y no se guarda en el navegador.</p>
+    <button id="enter">Abrir mi panel</button>
+  </section>
+
+  <div id="panel" class="hidden">
+    <section>
+      <h2>1. Conecta o repara Lovense Remote</h2>
+      <div id="connection" class="status">Comprobando conexión…</div>
+      <p>El QR se usa la primera vez o si necesitas volver a enlazar. Para el uso diario basta con encender el juguete y conectarlo a Lovense Remote.</p>
+      <button id="makeQr">Conectar por primera vez / Reparar conexión</button>
+      <img id="qr" class="hidden" alt="Código QR para Lovense Remote">
+    </section>
+
+    <section>
+      <h2>2. Tus dispositivos</h2>
+      <div id="devices" class="status">Todavía no se detectaron dispositivos.</div>
+      <div class="row"><button id="refresh" class="secondary">Actualizar</button><button id="stop" class="danger">PARAR TODO</button></div>
+    </section>
+
+    <section>
+      <h2>3. Conecta ChatGPT</h2>
+      <p>Copia este enlace en la configuración de tu app/conector. ChatGPT abrirá una pantalla segura y te pedirá la Owner Key para autorizarse.</p>
+      <div class="secret"><input id="mcpUrl" readonly><button id="copy" class="secondary">Copiar</button></div>
+    </section>
+  </div>
+  <div id="message" class="hidden"></div>
+</main>
+<script>
+let key="";
+const $=id=>document.getElementById(id);
+function message(text,error=false){const el=$("message");el.textContent=text;el.className=error?"error":"ok";el.classList.remove("hidden")}
+async function api(path,options={}){const res=await fetch(path,{...options,headers:{"content-type":"application/json","authorization":"Bearer "+key,...options.headers}});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||"No se pudo completar la acción.");return data}
+function render(data){$("login").classList.add("hidden");$("panel").classList.remove("hidden");$("mcpUrl").value=data.mcpUrl;$("connection").textContent=data.connectionState==="connected"?"Servidor conectado a Lovense.":`Estado: ${data.connectionState}${data.connectionError?" — "+data.connectionError:""}`;const toys=data.deviceInfo?.toys||[];$("devices").className=toys.length?"":"status";$("devices").innerHTML=toys.length?toys.map(t=>`<div class="device"><span><strong>${escapeHtml(t.nickname||t.name)}</strong><small>${escapeHtml(t.name)} · batería ${t.battery<0?"?":t.battery+"%"} · ${t.connected?"conectado":"desconectado"}<br>${t.capabilities.length?escapeHtml(t.capabilities.join(", ")):"funciones por confirmar"}</small></span></div>`).join(""):"Todavía no se detectaron dispositivos."}
+function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+async function refresh(){render(await api("/api/admin/status"))}
+$("enter").onclick=async()=>{key=$("ownerKey").value.trim();if(!key)return message("Necesito tu Owner Key.",true);try{await refresh();$("ownerKey").value="";message("Panel abierto.")}catch(e){key="";message(e.message,true)}};
+$("refresh").onclick=()=>refresh().catch(e=>message(e.message,true));
+$("makeQr").onclick=async()=>{try{const data=await api("/api/admin/qr",{method:"POST",body:"{}"});$("qr").src=data.qrcodeUrl;$("qr").classList.remove("hidden");message("QR listo. Escanéalo desde Lovense Remote.")}catch(e){message(e.message,true)}};
+$("stop").onclick=async()=>{try{await api("/api/admin/stop",{method:"POST",body:"{}"});message("Todo detenido.")}catch(e){message(e.message,true)}};
+$("copy").onclick=async()=>{await navigator.clipboard.writeText($("mcpUrl").value);message("Enlace privado copiado.")};
+</script>
+</body>
+</html>
