@@ -43,7 +43,7 @@ export function loadConfig(): AppConfig {
     port: integer("PORT", 3000, 1, 65535),
     publicBaseUrl,
     lovenseDeveloperToken: required("LOVENSE_DEVELOPER_TOKEN"),
-    lovensePlatformName: process.env.LOVENSE_PLATFORM_NAME?.trim() || "Lilazul Lovense",
+    lovensePlatformName: required("LOVENSE_PLATFORM_NAME"),
     lovenseUid: process.env.LOVENSE_UID?.trim() || "owner",
     ownerSecret,
     mcpPathSecret,
