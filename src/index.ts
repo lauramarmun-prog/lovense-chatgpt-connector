@@ -116,9 +116,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/health", (_req, res) => {
-  const status = lovense.status();
-  res.json({ ok: true, version: "0.1.0", lovense: status.connectionState });
+app.get("/health", (req, res) => {
+  console.log(`[health] request received from ${req.headers.host || "unknown host"}`);
+  res.status(200).type("text/plain").send("ok");
 });
 
 app.get("/.well-known/oauth-protected-resource", (_req, res) => res.json(oauth.protectedResourceMetadata()));
