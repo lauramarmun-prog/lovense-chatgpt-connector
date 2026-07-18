@@ -100,11 +100,22 @@ function html(value: string): string {
   return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[character]!);
 }
 
-function authorizePage(fields: Record<string, string>, error = ""): string {
+type UiLanguage = "es" | "en";
+
+function requestLanguage(req: Request): UiLanguage {
+  const cookieLanguage = (req.headers.cookie || "").match(/(?:^|;\s*)lilazul-language=(es|en)(?:;|$)/)?.[1];
+  if (cookieLanguage === "es" || cookieLanguage === "en") return cookieLanguage;
+  return (req.headers["accept-language"] || "").toLowerCase().startsWith("es") ? "es" : "en";
+}
+
+function authorizePage(fields: Record<string, string>, error = "", language: UiLanguage = "en"): string {
   const hidden = Object.entries(fields)
     .filter(([name]) => name !== "owner_secret" && name !== "decision")
     .map(([name, value]) => `<input type="hidden" name="${html(name)}" value="${html(value)}">`).join("");
-  return `<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Autorizar Lilazul Lovense</title><style>color-scheme:dark;*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#35205f,#0d0a18 55%);color:#f8f5ff;font:16px/1.5 system-ui}.card{width:min(480px,100%);padding:28px;border-radius:24px;background:#17112bd9;border:1px solid #ffffff22;box-shadow:0 24px 80px #0007}h1{margin-top:0;color:#c5a9ff}label{display:block;color:#c9c0dc;margin:18px 0 7px}input,button{width:100%;padding:13px;border-radius:12px;border:1px solid #ffffff2d;background:#0e0a1d;color:#fff;font:inherit}button{margin-top:12px;background:linear-gradient(135deg,#704dc5,#287b9e);font-weight:700;cursor:pointer}.deny{background:#251d38}.error{color:#ff9ab0}.small{color:#bdb4d3;font-size:.9rem}</style></head><body><main class="card"><h1>¿Conectar ChatGPT?</h1><p>ChatGPT solicita permiso para detectar y controlar los dispositivos Lovense que tú conectes a Lovense Remote. Si el juguete está apagado o desconectado, no podrá actuar.</p>${error ? `<p class="error">${html(error)}</p>` : ""}<form method="post" action="/oauth/authorize">${hidden}<label for="owner_secret">Tu Owner Key</label><input id="owner_secret" name="owner_secret" type="password" autocomplete="current-password" required><button name="decision" value="approve">Autorizar mi ChatGPT</button><button class="deny" name="decision" value="deny">Cancelar</button></form><p class="small">La clave se envía solo a tu propia instancia de Railway mediante HTTPS.</p></main></body></html>`;
+  const copy = language === "es"
+    ? { title: "Autorizar Lilazul Lovense", heading: "¿Conectar ChatGPT?", intro: "ChatGPT solicita permiso para detectar y controlar los dispositivos Lovense que tú conectes a Lovense Remote. Si el juguete está apagado o desconectado, no podrá actuar.", label: "Tu Owner Key", approve: "Autorizar mi ChatGPT", deny: "Cancelar", note: "La clave se envía solo a tu propia instancia de Railway mediante HTTPS." }
+    : { title: "Authorize Lilazul Lovense", heading: "Connect ChatGPT?", intro: "ChatGPT is requesting permission to detect and control the Lovense devices you connect to Lovense Remote. If the toy is turned off or disconnected, it cannot be controlled.", label: "Your Owner Key", approve: "Authorize my ChatGPT", deny: "Cancel", note: "The key is sent only to your own Railway instance over HTTPS." };
+  return `<!doctype html><html lang="${language}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${copy.title}</title><style>color-scheme:dark;*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#35205f,#0d0a18 55%);color:#f8f5ff;font:16px/1.5 system-ui}.card{width:min(480px,100%);padding:28px;border-radius:24px;background:#17112bd9;border:1px solid #ffffff22;box-shadow:0 24px 80px #0007}h1{margin-top:0;color:#c5a9ff}label{display:block;color:#c9c0dc;margin:18px 0 7px}input,button{width:100%;padding:13px;border-radius:12px;border:1px solid #ffffff2d;background:#0e0a1d;color:#fff;font:inherit}button{margin-top:12px;background:linear-gradient(135deg,#704dc5,#287b9e);font-weight:700;cursor:pointer}.deny{background:#251d38}.error{color:#ff9ab0}.small{color:#bdb4d3;font-size:.9rem}</style></head><body><main class="card"><h1>${copy.heading}</h1><p>${copy.intro}</p>${error ? `<p class="error">${html(error)}</p>` : ""}<form method="post" action="/oauth/authorize">${hidden}<label for="owner_secret">${copy.label}</label><input id="owner_secret" name="owner_secret" type="password" autocomplete="current-password" required><button name="decision" value="approve">${copy.approve}</button><button class="deny" name="decision" value="deny">${copy.deny}</button></form><p class="small">${copy.note}</p></main></body></html>`;
 }
 
 app.disable("x-powered-by");
@@ -135,13 +146,14 @@ app.post("/oauth/register", (req, res) => {
 
 app.get("/oauth/authorize", (req, res) => {
   const fields = inputStrings(req.query as Record<string, unknown>);
+  const language = requestLanguage(req);
   try {
     oauth.validateAuthorization(fields);
     res.setHeader("cache-control", "no-store");
     res.setHeader("content-security-policy", "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
-    res.send(authorizePage(fields));
+    res.send(authorizePage(fields, "", language));
   } catch (error) {
-    res.status(400).send(authorizePage(fields, error instanceof Error ? error.message : "Invalid authorization request."));
+    res.status(400).send(authorizePage(fields, error instanceof Error ? error.message : language === "es" ? "Solicitud de autorización no válida." : "Invalid authorization request.", language));
   }
 });
 
@@ -149,6 +161,7 @@ app.post("/oauth/authorize", (req, res) => {
   const fields = inputStrings(req.body || {});
   const redirectUri = fields.redirect_uri;
   const authKey = req.ip || "unknown";
+  const language = requestLanguage(req);
   try {
     oauth.validateAuthorization(fields);
     const redirect = new URL(redirectUri || "");
@@ -159,12 +172,12 @@ app.post("/oauth/authorize", (req, res) => {
       return;
     }
     if (authBlocked(authKey)) {
-      res.status(429).send(authorizePage(fields, "Demasiados intentos. Espera unos minutos."));
+      res.status(429).send(authorizePage(fields, language === "es" ? "Demasiados intentos. Espera unos minutos." : "Too many attempts. Wait a few minutes.", language));
       return;
     }
     if (!secureEqual(fields.owner_secret || "", config.ownerSecret)) {
       authFailed(authKey);
-      res.status(401).send(authorizePage(fields, "La Owner Key no es correcta."));
+      res.status(401).send(authorizePage(fields, language === "es" ? "La Owner Key no es correcta." : "The Owner Key is not correct.", language));
       return;
     }
     failedAuth.delete(authKey);
@@ -172,7 +185,7 @@ app.post("/oauth/authorize", (req, res) => {
     if (fields.state) redirect.searchParams.set("state", fields.state);
     res.redirect(303, redirect.toString());
   } catch (error) {
-    res.status(400).send(authorizePage(fields, error instanceof Error ? error.message : "Authorization failed."));
+    res.status(400).send(authorizePage(fields, error instanceof Error ? error.message : language === "es" ? "La autorización ha fallado." : "Authorization failed.", language));
   }
 });
 
