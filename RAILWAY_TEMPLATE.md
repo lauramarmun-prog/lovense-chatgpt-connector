@@ -1,8 +1,40 @@
-# Lovense Connector for ChatGPT
+# Deploy and Host Lovense Connector for ChatGPT
 
 A private, self-hosted MCP connector that lets ChatGPT detect and control the Lovense devices you connect to Lovense Remote. Each Railway deployment belongs to one owner and keeps its credentials isolated.
 
 > Independent community project. Not affiliated with, sponsored by, or endorsed by Lovense.
+
+## About Hosting Lovense Connector for ChatGPT
+
+This template runs a personal Streamable HTTP MCP server, an OAuth 2.1 authorization flow, and a small setup panel in one Railway service. It connects to Lovense's Standard Socket API, discovers compatible devices through Lovense Remote, and keeps each owner's credentials and encrypted device state inside her own deployment.
+
+## Why Deploy Lovense Connector for ChatGPT on Railway?
+
+- One-click infrastructure with HTTPS and a public MCP URL
+- Isolated secrets for every owner
+- Automatically generated signing and encryption keys
+- Persistent encrypted device state
+- No shared database, analytics, or advertising
+- Simple redeployment from the public source repository
+
+## Common Use Cases
+
+- Connect one personal Lovense device to ChatGPT
+- Discover and control several connected Lovense devices independently
+- Use different functions depending on each model's capabilities
+- Run timed functions, custom patterns, and Lovense presets
+- Stop one or every connected device immediately
+
+## Dependencies for Lovense Connector for ChatGPT Hosting
+
+The connector does not require a separate database or an OpenAI API key.
+
+### Deployment Dependencies
+
+- A Railway account
+- A Lovense account with a **Standard API** Developer Token and Website Name
+- Lovense Remote with at least one paired compatible device
+- ChatGPT developer mode for adding the MCP app
 
 ## Before deploying
 
