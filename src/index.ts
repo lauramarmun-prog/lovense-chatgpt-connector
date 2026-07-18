@@ -150,7 +150,7 @@ app.get("/oauth/authorize", (req, res) => {
   try {
     oauth.validateAuthorization(fields);
     res.setHeader("cache-control", "no-store");
-    res.setHeader("content-security-policy", "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+    res.setHeader("content-security-policy", "default-src 'none'; style-src 'unsafe-inline'; form-action 'self' https://chatgpt.com; frame-ancestors 'none'; base-uri 'none'");
     res.send(authorizePage(fields, "", language));
   } catch (error) {
     res.status(400).send(authorizePage(fields, error instanceof Error ? error.message : language === "es" ? "Solicitud de autorización no válida." : "Invalid authorization request.", language));
