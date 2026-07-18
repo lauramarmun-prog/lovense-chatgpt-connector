@@ -85,7 +85,7 @@ Variable opcional: `MAX_COMMAND_SECONDS` (3600) limita una duración numérica a
 
 ## Plantilla de Railway
 
-La [plantilla compartida](https://railway.com/deploy/Qs5_EU?utm_medium=integration&utm_source=template&utm_campaign=lovense-chatgpt-connector) ya incluye red pública, puerto y health check compatibles, volumen persistente en `/data`, secretos automáticos y explicaciones en español. La usuaria solo tiene que proporcionar el token, copiar el **Website Name** exacto de su proyecto Lovense y elegir su contraseña privada.
+La [plantilla compartida](https://railway.com/deploy/Qs5_EU?utm_medium=integration&utm_source=template&utm_campaign=lovense-chatgpt-connector) ya incluye red pública y puerto compatibles, un endpoint `/health`, volumen persistente en `/data`, secretos automáticos y explicaciones en español. La usuaria solo tiene que proporcionar el token, copiar el **Website Name** exacto de su proyecto Lovense y elegir su contraseña privada.
 
 Railway recomienda generar secretos en la plantilla, describir cada variable y configurar un health check. Véase [Create a Template](https://docs.railway.com/templates/create) y [Template Best Practices](https://docs.railway.com/templates/best-practices).
 

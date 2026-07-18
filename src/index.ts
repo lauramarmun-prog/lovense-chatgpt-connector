@@ -116,8 +116,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get("/health", (req, res) => {
-  console.log(`[health] request received from ${req.headers.host || "unknown host"}`);
+app.get("/health", (_req, res) => {
   res.status(200).type("text/plain").send("ok");
 });
 
