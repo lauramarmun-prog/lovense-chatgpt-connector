@@ -4,11 +4,13 @@ Un conector privado de Lovense para ChatGPT y otros clientes MCP. Está pensado 
 
 > Proyecto comunitario independiente. No está afiliado, patrocinado ni aprobado por Lovense.
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/Qs5_EU?utm_medium=integration&utm_source=template&utm_campaign=lovense-chatgpt-connector)
+
 ## La experiencia para la usuaria
 
 1. Pulsa **Deploy on Railway** en la plantilla publicada.
-2. Pega su `LOVENSE_DEVELOPER_TOKEN`; Railway genera las demás claves privadas.
-3. Abre el dominio que Railway le entrega e introduce su `OWNER_SECRET`.
+2. Pega su `LOVENSE_DEVELOPER_TOKEN` y elige una contraseña privada como `OWNER_SECRET`; Railway genera las demás claves.
+3. Abre el dominio que Railway le entrega e introduce la misma contraseña.
 4. Pulsa **Crear código QR** y lo escanea desde Lovense Remote.
 5. Copia la URL `/mcp` en ChatGPT. ChatGPT abre OAuth y pide la Owner Key una sola vez.
 6. Para usarlo cualquier día, enciende el juguete, conéctalo a Lovense Remote y pídeselo a la IA.
@@ -70,7 +72,7 @@ El proceso no carga `.env` automáticamente. En desarrollo, importa esas variabl
 | Variable | Quién la proporciona | Descripción |
 | --- | --- | --- |
 | `LOVENSE_DEVELOPER_TOKEN` | La usuaria | Token privado de su proyecto Lovense Developer. Nunca va al navegador. |
-| `OWNER_SECRET` | Railway: `${{secret(32)}}` | Clave que la dueña usa para abrir el panel y aprobar OAuth. |
+| `OWNER_SECRET` | La usuaria | Contraseña que la dueña elige para abrir el panel y aprobar OAuth. |
 | `MCP_PATH_SECRET` | Railway: `${{secret(48)}}` | Acceso alternativo para clientes MCP sin OAuth. No se muestra en el panel. |
 | `OAUTH_SIGNING_KEY` | Railway: `${{secret(64)}}` | Firma códigos y tokens OAuth. Rotarla revoca todos los enlaces. |
 | `STATE_ENCRYPTION_KEY` | Railway: `${{secret(64)}}` | Cifra el estado guardado. Si cambia, hay que volver a escanear el QR. |
@@ -80,15 +82,9 @@ El proceso no carga `.env` automáticamente. En desarrollo, importa esas variabl
 
 Variable opcional: `MAX_COMMAND_SECONDS` (3600) limita una duración numérica accidentalmente enorme. El valor `0` sigue significando “hasta que la usuaria diga que pare”.
 
-## Preparar la plantilla de Railway
+## Plantilla de Railway
 
-El repositorio ya contiene `railway.json`, compilación reproducible y `/health`. En el editor de plantillas de Railway:
-
-1. Añade este repositorio como un servicio con red pública.
-2. Crea las variables anteriores; usa las funciones `secret()` para todas salvo el token de Lovense.
-3. Adjunta un volumen en `/data` y define `STATE_FILE=/data/lovense-state.enc`.
-4. Mantén `/health` como health check.
-5. Publica la plantilla y añade a este README el botón que Railway genere.
+La [plantilla compartida](https://railway.com/deploy/Qs5_EU?utm_medium=integration&utm_source=template&utm_campaign=lovense-chatgpt-connector) ya incluye red pública, volumen persistente en `/data`, health check en `/health`, secretos automáticos y explicaciones en español. La usuaria solo tiene que proporcionar el token de Lovense y elegir su contraseña privada.
 
 Railway recomienda generar secretos en la plantilla, describir cada variable y configurar un health check. Véase [Create a Template](https://docs.railway.com/templates/create) y [Template Best Practices](https://docs.railway.com/templates/best-practices).
 
