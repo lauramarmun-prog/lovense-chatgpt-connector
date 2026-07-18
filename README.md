@@ -6,6 +6,8 @@ Un conector privado de Lovense para ChatGPT y otros clientes MCP. Está pensado 
 
 [![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/lovense-connector-for-chatgpt?utm_medium=integration&utm_source=template&utm_campaign=lovense-chatgpt-connector)
 
+¿Es tu primera vez? Sigue la **[guía completa paso a paso](GUIA_PASO_A_PASO.md)**: empieza creando la cuenta de Lovense Developer y termina con una prueba segura desde ChatGPT.
+
 ## La experiencia para la usuaria
 
 1. Pulsa **Deploy on Railway** en la plantilla publicada.
@@ -86,6 +88,8 @@ Variable opcional: `MAX_COMMAND_SECONDS` (3600) limita una duración numérica a
 ## Plantilla de Railway
 
 La [plantilla pública](https://railway.com/deploy/lovense-connector-for-chatgpt?utm_medium=integration&utm_source=template&utm_campaign=lovense-chatgpt-connector) ya incluye red pública y puerto compatibles, un endpoint `/health`, volumen persistente en `/data`, secretos automáticos e instrucciones bilingües. La usuaria solo tiene que proporcionar el token, copiar el **Website Name** exacto de su proyecto Lovense y elegir su contraseña privada.
+
+Para una instalación desde cero, consulta la [guía completa para principiantes](GUIA_PASO_A_PASO.md).
 
 Railway recomienda generar secretos en la plantilla, describir cada variable y configurar un health check. Véase [Create a Template](https://docs.railway.com/templates/create) y [Template Best Practices](https://docs.railway.com/templates/best-practices).
 

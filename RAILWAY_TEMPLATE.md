@@ -38,6 +38,8 @@ The connector does not require a separate database or an OpenAI API key.
 
 ## Before deploying
 
+New to Railway or Lovense Developer? Follow the [complete Spanish step-by-step guide](https://github.com/lauramarmun-prog/lovense-chatgpt-connector/blob/main/GUIA_PASO_A_PASO.md).
+
 Open the Lovense Developer Dashboard, choose **Standard API**, and have these ready:
 
 - **Developer Token**
@@ -76,6 +78,8 @@ Un conector MCP privado y autoalojado que permite a ChatGPT detectar y controlar
 > Proyecto comunitario independiente. No está afiliado, patrocinado ni aprobado por Lovense.
 
 ## Antes de desplegar
+
+Si es tu primera vez con Railway o Lovense Developer, sigue la [guía completa paso a paso](https://github.com/lauramarmun-prog/lovense-chatgpt-connector/blob/main/GUIA_PASO_A_PASO.md).
 
 Abre el panel Lovense Developer, elige **Standard API** y prepara:
 
