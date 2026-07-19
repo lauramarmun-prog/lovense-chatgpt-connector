@@ -131,6 +131,15 @@ app.get("/health", (_req, res) => {
   res.status(200).type("text/plain").send("ok");
 });
 
+app.use("/guides", express.static(join(process.cwd(), "public", "guides"), {
+  dotfiles: "deny",
+  fallthrough: false,
+  setHeaders: (res, filePath) => {
+    res.setHeader("content-disposition", `attachment; filename="${filePath.endsWith("_ES.docx") ? "Lilazul_Lovense_Guia_ES.docx" : "Lilazul_Lovense_Guide_EN.docx"}"`);
+    res.setHeader("cache-control", "public, max-age=3600");
+  },
+}));
+
 app.get("/.well-known/oauth-protected-resource", (_req, res) => res.json(oauth.protectedResourceMetadata()));
 app.get("/.well-known/oauth-protected-resource/mcp", (_req, res) => res.json(oauth.protectedResourceMetadata()));
 app.get("/.well-known/oauth-authorization-server", (_req, res) => res.json(oauth.metadata()));
